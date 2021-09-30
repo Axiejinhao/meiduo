@@ -3,9 +3,9 @@
   <component name="FacetManager">
     <facet type="django" name="Django">
       <configuration>
-        <option name="rootFolder" value="$MODULE_DIR$" />
-        <option name="settingsModule" value="meduo_mall/settings.py" />
-        <option name="manageScript" value="$MODULE_DIR$/manage.py" />
+        <option name="rootFolder" value="$MODULE_DIR$/../meiduo_mall" />
+        <option name="settingsModule" value="" />
+        <option name="manageScript" value="manage.py" />
         <option name="environment" value="&lt;map/&gt;" />
         <option name="doNotUseTestRunner" value="false" />
         <option name="trackFilePattern" value="migrations" />
@@ -13,7 +13,7 @@
     </facet>
   </component>
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$/../meiduo_mall" />
     <orderEntry type="jdk" jdkName="Python 3.8 (demo)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
