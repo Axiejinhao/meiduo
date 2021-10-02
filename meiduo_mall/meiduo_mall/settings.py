@@ -37,11 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.users',
+    # CORS
+    'corsheaders',
 ]
 
 # 中间件
 # 请求从上往下,响应从下往上执行
 MIDDLEWARE = [
+    # CORS的配置,放在最上面
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -186,3 +190,13 @@ LOGGING = {
 # 通过提供一个值给AUTH_USER_MODEL设置,指向自定义的模式,Django允许覆盖默认的User模型
 # 这个点式路径包含Django应用的名称(必须位于你的INSTALLED_APPS),要用作User模型的Django模型函数
 AUTH_USER_MODEL = 'users.User'
+
+# CORS 白名单
+CORS_ORIGIN_WHITELIST = (
+    'http://127.0.0.1:8080',
+    'http://localhost:8080',
+    'http://www.meiduo.site:8080',
+    'http://www.meiduo.site:8000',
+)
+# 允许携带cookie
+CORS_ALLOW_CREDENTIALS = True
