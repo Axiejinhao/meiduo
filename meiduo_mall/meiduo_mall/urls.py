@@ -31,9 +31,15 @@ def log(request):
     return HttpResponse('log')
 
 
+# 注册转换器
+from utils.converters import UsernameConverter
+from django.urls import register_converter
+
+register_converter(UsernameConverter, 'username_converter')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('log/', log),
     # 导入users子应用的路由
-    path('',include('apps.users.urls'))
+    path('', include('apps.users.urls'))
 ]

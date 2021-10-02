@@ -3,5 +3,5 @@ from apps.users.views import UsernameCount
 
 urlpatterns = [
     # 判断用户名是否重复
-    path('usernames/<username>/count/', UsernameCount.as_view()),
+    path('usernames/<username_converter:username>/count/', UsernameCount.as_view()),
 ]

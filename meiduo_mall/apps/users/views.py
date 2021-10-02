@@ -22,11 +22,14 @@ from django.shortcuts import render
 from django.views import View
 from apps.users.models import User
 from django.http import JsonResponse
+import re
 
 
 class UsernameCount(View):
     def get(self, request, username):
-        # 1.获取用户名
+        # 1.获取用户名,对用户名进行判断
+        # if not re.match('[a-zA-Z0-9_-]{5,20}', username):
+        #     return JsonResponse({'code': 200, 'errmsg': '用户名不满足条件'})
         # 2.查询数据
         count = User.objects.filter(username=username).count()
         # 3.返回响应
