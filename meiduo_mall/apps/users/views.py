@@ -1,3 +1,4 @@
+from django.contrib.auth import login
 from django.shortcuts import render
 
 # Create your views here.
@@ -104,6 +105,18 @@ class RegisterView(View):
             return JsonResponse({'code': 400, 'errmsg': '必须同意协议'})
         # 4. 数据入库
         # User.objects.create(username=username, password=password, mobile=mobile)
-        User.objects.create_user(username=username, password=password, mobile=mobile)
+        user = User.objects.create_user(username=username, password=password, mobile=mobile)
+
+        # 状态保持,登录用户的状态保持
+        # user是已经登录的用户信息
+        login(request, user)
+
         # 5. 返回响应
         return JsonResponse({'code': 0, 'errmsg': 'ok'})
+
+
+"""
+注册成功,已经登录
+注册成功,再次登录
+客户端cookie,服务端session
+"""
