@@ -1,7 +1,9 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from libs.captcha.captcha import captcha
 from django_redis import get_redis_connection
+from random import randint
+from libs.yuntongxun.sms import CCP
 
 # Create your views here.
 """
@@ -31,3 +33,59 @@ class ImageCodeView(View):
         # 4.返回图片二进制
         # content_type: 大类/小类
         return HttpResponse(image, content_type='image/jpeg')
+
+
+"""
+前端
+            当用户输入完 手机号，图片验证码之后，前端发送一个axios请求
+            sms_codes/18310820644/?image_code=knse&image_code_id=b7ef98bb-161b-437a-9af7-f434bb050643
+
+后端
+
+    请求：     接收请求，获取请求参数（路由有手机号， 用户的图片验证码和UUID在查询字符串中）
+    业务逻辑：  验证参数， 验证图片验证码， 生成短信验证码，保存短信验证码，发送短信验证码
+    响应：     返回响应
+            {‘code’:0,'errmsg':'ok'}
+
+
+    路由：     GET     sms_codes/18310820644/?image_code=knse&image_code_id=b7ef98bb-161b-437a-9af7-f434bb050643
+
+    步骤：
+            1. 获取请求参数
+            2. 验证参数
+            3. 验证图片验证码
+            4. 生成短信验证码
+            5. 保存短信验证码
+            6. 发送短信验证码
+            7. 返回响应
+"""
+
+
+class SmsCodeView(View):
+    def get(self, request, mobile):
+        # 1.获取请求参数
+        image_code = request.GET.get('image_code')
+        uuid = request.GET.get('image_code_id')
+
+        # 2.验证参数
+        if not all([image_code, uuid]):
+            return JsonResponse({'code': 400, 'errmag': '参数不全'})
+
+        # 3.验证图片验证码
+        redis_cli = get_redis_connection('code')
+        redis_image_code = redis_cli.get(uuid)
+        if redis_image_code is None:
+            return JsonResponse({'code': 400, 'errmag': '图形验证码已过期'})
+        if image_code.lower() != redis_image_code.decode().lower():
+            return JsonResponse({'code': 400, 'errmag': '图形验证码错误'})
+        # 4.生成短信验证码
+        sms_code = '%04d' % randint(0, 9999)
+
+        # 5.保存短信验证码
+        redis_cli.setex(mobile, 300, sms_code)
+
+        # 6.发送短信验证码
+        CCP().send_template_sms(mobile, [sms_code, 1], 1)
+
+        # 7.返回响应
+        return JsonResponse({'code': 0, 'errmsg': 'ok'})

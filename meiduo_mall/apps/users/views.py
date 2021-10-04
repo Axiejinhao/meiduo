@@ -68,6 +68,7 @@ class MobileCount(View):
     # 5. 返回响应
 """
 import json
+from django_redis import get_redis_connection
 
 
 class RegisterView(View):
@@ -79,10 +80,11 @@ class RegisterView(View):
 
         # 2. 获取数据
         username = body_dict.get('username')
-        password = str(body_dict.get('password'))
-        password2 = str(body_dict.get('password2'))
-        mobile = str(body_dict.get('mobile'))
+        password = body_dict.get('password')
+        password2 = body_dict.get('password2')
+        mobile = body_dict.get('mobile')
         allow = body_dict.get('allow')
+        sms_code = body_dict.get('sms_code').lower()
 
         # 3. 验证数据
         #     3.1 用户名,密码,确认密码,手机号,是否同意协议后都需要
@@ -103,6 +105,15 @@ class RegisterView(View):
         #     3.6 需要同意协议
         if not allow:
             return JsonResponse({'code': 400, 'errmsg': '必须同意协议'})
+
+        #     3.7 验证短信
+        redis_cli = get_redis_connection('code')
+        redis_sms_code = redis_cli.get(mobile)
+        if not redis_sms_code:
+            return JsonResponse({'code': 400, 'errmsg': '短信验证码失败'})
+        if redis_sms_code.decode().lower() != sms_code:
+            return JsonResponse({'code': 400, 'errmsg': '短信验证码错误'})
+
         # 4. 数据入库
         # User.objects.create(username=username, password=password, mobile=mobile)
         user = User.objects.create_user(username=username, password=password, mobile=mobile)
