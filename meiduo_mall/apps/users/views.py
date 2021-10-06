@@ -169,6 +169,12 @@ class LoginView(View):
         if not all([username, password]):
             return JsonResponse({'code': 400, 'errmsg': '参数不全'})
 
+        # 确定使用手机号查询还是用户名查询
+        if re.match('1[3-9][0-9]{9}', username):
+            User.USERNAME_FIELD = 'mobile'
+        else:
+            User.USERNAME_FIELD = 'username'
+
         # 3. 验证用户名和密码是否正确
         # 通过用户名查询数据库
         # User.objects.filter(username=username)
@@ -190,4 +196,33 @@ class LoginView(View):
             request.session.set_expiry(0)
 
         # 6. 返回响应
-        return JsonResponse({'code': 0, 'errmsg': 'ok'})
+        response = JsonResponse({'code': 0, 'errmsg': 'ok'})
+
+        response.set_cookie('username', username)
+
+        return response
+
+
+"""
+前端：
+    当用户点击退出按钮的时候，前端发送一个axios delete请求
+
+后端：
+    请求
+    业务逻辑        退出
+    响应      返回JSON数据
+
+"""
+from django.contrib.auth import logout
+
+
+class LogoutView(View):
+    def get(self, request):
+        # 1. 删除session信息
+        logout(request)
+
+        response = JsonResponse({'code': 0, 'errmsg': 'ok'})
+        # 2. 删除cookie信息,前端根据cookie信息来判断用户是否登录
+        response.delete_cookie('username')
+
+        return response
