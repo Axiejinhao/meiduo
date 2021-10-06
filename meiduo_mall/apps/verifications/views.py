@@ -105,7 +105,10 @@ class SmsCodeView(View):
         # redis_cli.setex('send_flag_%s' % mobile, 60, 1)
 
         # 6.发送短信验证码
-        CCP().send_template_sms(mobile, [sms_code, 1], 1)
+        # CCP().send_template_sms(mobile, [sms_code, 1], 1)
+        from celery_tasks.sms.tasks import celery_send_sms_code
+        # delay的参数等同于任务函数的参数
+        celery_send_sms_code.delay(mobile, sms_code)
 
         # 7.返回响应
         return JsonResponse({'code': 0, 'errmsg': 'ok'})
