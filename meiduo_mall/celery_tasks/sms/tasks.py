@@ -7,4 +7,4 @@ from celery_tasks.main import app
 
 @app.task
 def celery_send_sms_code(mobile, code):
-    CCP().send_template_sms(mobile, [code, 1], 1)
+    CCP().send_template_sms(mobile, [code, 2], 1)
