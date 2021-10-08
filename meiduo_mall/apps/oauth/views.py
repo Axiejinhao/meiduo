@@ -155,7 +155,10 @@ class OauthQQView(View):
             qquser = OAuthQQUser.objects.get(openid=openid)
         except OAuthQQUser.DoesNotExist:
             # 5. 如果没有绑定过，则需要绑定
-            response = JsonResponse({'code': 400, 'access_token': openid})
+            from apps.oauth.utils import generic_openid
+            access_token = generic_openid(openid)
+
+            response = JsonResponse({'code': 400, 'access_token': access_token})
             return response
         else:
             # 6. 如果绑定过，则直接登录
@@ -174,7 +177,7 @@ class OauthQQView(View):
         mobile = data.get('mobile')
         password = data.get('password')
         sms_code = data.get('sms_code')
-        openid = data.get('access_token')
+        access_token = data.get('access_token')
 
         # 参数验证
         if not all([mobile, password, sms_code]):
@@ -190,6 +193,11 @@ class OauthQQView(View):
             return JsonResponse({'code': 400, 'errmsg': '短信验证码失败'})
         if redis_sms_code.decode().lower() != sms_code:
             return JsonResponse({'code': 400, 'errmsg': '短信验证码错误'})
+
+        from apps.oauth.utils import check_access_token
+        openid = check_access_token(access_token)
+        if openid is None:
+            return JsonResponse({'code': 400, 'errmsg': '参数缺失'})
 
         # 3. 根据手机号进行用户信息的查询
         try:
@@ -214,3 +222,23 @@ class OauthQQView(View):
         response.set_cookie('username', user.username)
 
         return response
+
+
+# itsdangerous的基本使用,itsdangerous就是为了数据加密的
+from meiduo_mall import settings
+# 加密
+# 1. 导入itsdangerous的类
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+
+# 2. 创建类的实例对象
+# secret_key,           秘钥
+# expires_in=None       数据的过期时间（单位是秒）
+s = Serializer(secret_key=settings.SECRET_KEY, expires_in=3600)
+# 3. 加密数据
+token = s.dumps({'openid': '1234567890'})
+
+# 解密
+# 1. 导入 itsdangerous的类
+# 2. 创建类的实例对象
+# 3. 解密数据
+s.loads(token)
