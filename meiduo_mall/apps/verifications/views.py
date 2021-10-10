@@ -37,8 +37,8 @@ class ImageCodeView(View):
 
 """
 前端
-            当用户输入完 手机号，图片验证码之后，前端发送一个axios请求
-            sms_codes/18310820644/?image_code=knse&image_code_id=b7ef98bb-161b-437a-9af7-f434bb050643
+        当用户输入完 手机号，图片验证码之后，前端发送一个axios请求
+        sms_codes/18310820644/?image_code=knse&image_code_id=b7ef98bb-161b-437a-9af7-f434bb050643
 
 后端
 
@@ -48,7 +48,7 @@ class ImageCodeView(View):
             {‘code’:0,'errmsg':'ok'}
 
 
-    路由：     GET     sms_codes/18310820644/?image_code=knse&image_code_id=b7ef98bb-161b-437a-9af7-f434bb050643
+    路由：     GET sms_codes/18310820644/?image_code=knse&image_code_id=b7ef98bb-161b-437a-9af7-f434bb050643
 
     步骤：
             1. 获取请求参数

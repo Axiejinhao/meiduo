@@ -135,7 +135,7 @@ class RegisterView(View):
 """
 登录
 
-前端：当用户把用户名和密码输入完成之后，会点击登录按钮。这个时候前端应该发送一个axios请求
+前端：当用户把用户名和密码输入完成之后,会点击登录按钮,这个时候前端应该发送一个axios请求
 
 后端：
     请求 接收数据，验证数据
@@ -209,8 +209,8 @@ class LoginView(View):
 
 后端：
     请求
-    业务逻辑        退出
-    响应      返回JSON数据
+    业务逻辑 退出
+    响应 返回JSON数据
 
 """
 from django.contrib.auth import logout
@@ -250,3 +250,106 @@ class CenterView(LoginRequiredJSONMixin, View):
         }
 
         return JsonResponse({'code': 0, 'errmsg': 'ok', 'info_data': info_data})
+
+
+"""
+需求：1.保存邮箱地址  2.发送一封激活邮件  3. 用户激活邮件
+
+前端：
+    当用户输入邮箱之后，点击保存。这个时候会发送axios请求。
+
+后端：
+    请求 接收请求，获取数据
+    业务逻辑 保存邮箱地址  发送一封激活邮件
+    响应 JSON  code=0
+
+    路由 PUT     
+    步骤
+        1. 接收请求
+        2. 获取数据
+        3. 保存邮箱地址
+        4. 发送一封激活邮件
+        5. 返回响应
+
+需求(要实现什么功能)-->思路(请求,业务逻辑,响应)-->步骤-->代码实现
+"""
+
+"""
+
+1. 设置邮件服务器
+    我们设置 163邮箱服务器
+    相当于 我们开启了 让163帮助我们发送邮件。同时设置了 一些信息（特别是授权码）
+2.  设置邮件发送的配置信息
+    #  让django的哪个类来发送邮件
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    # 邮件服务器的主机和端口号
+    EMAIL_HOST = 'smtp.163.com'
+    EMAIL_PORT = 25
+    # 使用我的 163服务器 和 授权码
+    #发送邮件的邮箱
+    EMAIL_HOST_USER = ''
+    #在邮箱中设置的客户端授权密码
+    EMAIL_HOST_PASSWORD = ''
+3. 调用  send_mail 方法
+"""
+
+from django.core.mail import send_mail
+from apps.users.utils import generic_email_verify_token
+from celery_tasks.email.tasks import celery_send_email
+
+
+class EmailView(LoginRequiredJSONMixin, View):
+    def put(self, request):
+        # 1. 接收请求
+        data = json.loads(request.body.decode())
+
+        # 2. 获取数据
+        email = data.get('email')
+        # 验证数据
+        if re.match('[0-9a-zA-Z_.-]+[@][0-9a-zA-Z_.-]+([.][a-zA-Z]+){1,2}', email):
+            pass
+        else:
+            return JsonResponse({'code': 400, 'errmsg': '邮箱格式错误'})
+
+        # 3. 保存邮箱地址
+        # request.user 是已经登录的用户信息
+        user = request.user
+        user.email = email
+        user.save()
+
+        # 4. 发送一封激活邮件
+
+        # subject 主题, message 邮件内容, from_email 发件人, recipient_list 收件人列表
+        subject = '美多商城激活邮箱'
+        message = ''
+        from_email = '美多商城<17858752743@163.com>'
+        recipient_list = ['2103098110@qq.com']
+
+        # 4.1 对标签数据进行加密处理
+        token = generic_email_verify_token(request.user.id)
+
+        # 4.2 组织激活邮件
+        verify_url = "http://www.meiduo.site:8080/success_verify_email.html?token=%s" % token
+
+        html_message = '<p>尊敬的用户您好！</p>' \
+                       '<p>感谢您使用美多商城。</p>' \
+                       '<p>您的邮箱为：%s 。请点击此链接激活您的邮箱：</p>' \
+                       '<p><a href="%s">%s<a></p>' % (email, verify_url, verify_url)
+
+        # send_mail(
+        #     subject=subject,
+        #     message=html_message,
+        #     from_email=from_email,
+        #     recipient_list=recipient_list,
+        # )
+
+        celery_send_email.delay(
+            subject=subject,
+            message=message,
+            from_email=from_email,
+            recipient_list=recipient_list,
+            html_message=html_message,
+        )
+
+        # 5. 返回响应
+        return JsonResponse({'code': 0, 'errmsg': 'ok'})
