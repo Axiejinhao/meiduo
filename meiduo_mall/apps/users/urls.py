@@ -3,6 +3,8 @@ from apps.users.views import UsernameCount
 from apps.users.views import MobileCount
 from apps.users.views import RegisterView, LoginView, LogoutView
 from apps.users.views import CenterView, EmailView
+from apps.users.views import EmailVerifyView
+
 urlpatterns = [
     # 判断用户名是否重复
     path('usernames/<username_converter:username>/count/', UsernameCount.as_view()),
@@ -12,4 +14,5 @@ urlpatterns = [
     path('logout/', LogoutView.as_view()),
     path('info/', CenterView.as_view()),
     path('emails/', EmailView.as_view()),
+    path('emails/verification/', EmailVerifyView.as_view()),
 ]
