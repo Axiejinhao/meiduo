@@ -95,6 +95,30 @@ INSERT INTO `tb_content` VALUES (1,'2018-04-09 16:50:23.230734','2018-04-09 16:5
 UNLOCK TABLES;
 
 --
+-- Table structure for table `tb_channel_group`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tb_channel_group` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tb_channel_group`
+--
+
+LOCK TABLES `tb_channel_group` WRITE;
+/*!40000 ALTER TABLE `tb_channel_group` DISABLE KEYS */;
+INSERT INTO `tb_channel_group` VALUES (1, '手机数码'),(2, '电脑家电'),(3, '家居家装'),(4, '男女童装'),(5, '女鞋箱包'),(6, '手机数码'),(7, '运动户外'),(8, '房产汽车'),(9, '食品生鲜'),(10, '图书音像'),(11, '旅游生活');
+/*!40000 ALTER TABLE `tb_channel_group` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+--
 -- Table structure for table `tb_goods_category`
 --
 
@@ -122,28 +146,6 @@ INSERT INTO `tb_goods_category` VALUES (1,'2018-04-09 08:03:18.507741','2018-04-
 /*!40000 ALTER TABLE `tb_goods_category` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `tb_channel_group`
---
-
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `tb_channel_group` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `tb_channel_group`
---
-
-LOCK TABLES `tb_channel_group` WRITE;
-/*!40000 ALTER TABLE `tb_channel_group` DISABLE KEYS */;
-INSERT INTO `tb_channel_group` VALUES (1, '手机数码'),(2, '电脑家电'),(3, '家居家装'),(4, '男女童装'),(5, '女鞋箱包'),(6, '手机数码'),(7, '运动户外'),(8, '房产汽车'),(9, '食品生鲜'),(10, '图书音像'),(11, '旅游生活');
-/*!40000 ALTER TABLE `tb_channel_group` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `tb_goods_channel`

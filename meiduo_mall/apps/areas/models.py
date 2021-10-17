@@ -25,10 +25,11 @@ class Area(models.Model):
     def __str__(self):
         return self.name
 
+
 """
 查询省份信息
  select * from tb_areas where parent_id is NULL;
- 
+
  Area.objects.filter(parent=None)
  Area.objects.filter(parent__isnull=True)
  Area.objects.filter(parent_id__isnull=True)
@@ -43,10 +44,10 @@ select * from tb_areas where parent_id=130000;
 
 查询区县的信息
 select * from tb_areas where parent_id=130600;
-    
+
     Area.objects.filter(parent_id=130600)
     Area.objects.filter(parent=130600)
     >>> city=Area.objects.get(id=130600)   #市
     >>> city.subs.all()                    #区县
-    
+
 """
