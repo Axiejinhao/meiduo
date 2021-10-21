@@ -1,6 +1,6 @@
 from django.urls import path
 from apps.goods.views import IndexView, ListView
-from apps.goods.views import SKUSearchView
+from apps.goods.views import SKUSearchView, DetailView
 
 
 urlpatterns = [
@@ -8,4 +8,5 @@ urlpatterns = [
     path('list/<category_id>/skus/', ListView.as_view()),
 
     path('search/', SKUSearchView()),
+    path('detail/<sku_id>/', DetailView.as_view()),
 ]
