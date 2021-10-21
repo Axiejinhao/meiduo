@@ -121,3 +121,31 @@ class ListView(View):
 
         # 6.返回响应
         return JsonResponse({'code': 0, 'errmsg': 'ok', 'list': sku_list, 'count': total_num, 'breadcrumb': breadcrumb})
+
+
+"""
+搜索 
+1. 不使用like
+
+2. 使用 全文检索即在指定的任意字段中进行检索查询
+
+3. 全文检索方案需要配合搜索引擎来实现
+
+4. 搜索引擎
+
+    原理：  关键词与词条的对应关系，并记录词条的位置
+
+5. Elasticsearch
+    进行分词操作 
+    分词是指将一句话拆解成多个单字或词，这些字或词便是这句话的关键词
+
+6. 
+    数据         <----------Haystack--------->             elasticsearch 
+
+                        ORM(面向对象操作模型)                 mysql,oracle,sqlite,sql server
+
+ 我们/数据         <----------Haystack--------->             elasticsearch 
+
+ 借助于 haystack 来对接 elasticsearch
+ 所以 haystack 可以帮助 查询数据
+"""

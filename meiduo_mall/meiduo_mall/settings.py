@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'apps.contents',
     # CORS
     'corsheaders',
+    # haystack
+    'haystack',
 ]
 
 # 中间件
@@ -247,3 +249,13 @@ EMAIL_HOST_PASSWORD = 'TRIEOUREIFOYZQIS'
 
 # 加载自定义文件存储类
 DEFAULT_FILE_STORAGE = 'utils.fastdfs.storage.MyStorage'
+
+
+# ElasticSearch的配置
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://192.168.88.129:9200/',
+        'INDEX_NAME': 'meiduo',
+    },
+}
