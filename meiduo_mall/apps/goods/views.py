@@ -1,3 +1,5 @@
+import time
+
 from django.shortcuts import render
 
 # # Create your views here.
@@ -215,3 +217,70 @@ class DetailView(View):
             'specs': goods_specs,
         }
         return render(request, 'detail.html', context)
+
+
+"""
+需求：
+    统计每一天的分类商品访问量
+
+前端：
+    当访问具体页面的时候，会发送一个axios请求。携带分类id
+后端：
+    请求：         接收请求，获取参数
+    业务逻辑：       查询有没有，有的话更新数据，没有新建数据
+    响应：         返回JSON
+
+    路由：     POST    detail/visit/<category_id>/
+    步骤：
+
+        1.接收分类id
+        2.验证参数（验证分类id）
+        3.查询当天 这个分类的记录有没有
+        4. 没有新建数据
+        5. 有的话更新数据
+        6. 返回响应
+
+"""
+
+"""
+将经过数据库查询,已经渲染的HTML页面,写入指定页面
+用户可以直接访问已经渲染好的静态页面
+"""
+from apps.contents.models import ContentCategory
+from utils.goods import get_categories
+import time
+
+
+def generic_meiduo_index():
+    print('----------------%s-----------------' % time.ctime())
+
+    # 1.商品分类数据
+    categories = get_categories()
+
+    # 2.广告数据
+    contents = {}
+    content_categories = ContentCategory.objects.all()
+    for cat in content_categories:
+        contents[cat.key] = cat.content_set.filter(status=True).order_by('sequence')
+
+    # 我们把数据传递给模板
+    context = {
+        'categories': categories,
+        'contents': contents,
+    }
+
+    # 加载渲染的模板
+    from django.template import loader
+    index_template = loader.get_template('index.html')
+
+    # 模板渲染
+    index_html_data = index_template.render(context)
+
+    # 写入指定文件
+    from meiduo_mall import settings
+    import os
+    file_path = os.path.join(os.path.dirname(settings.BASE_DIR), 'front_end_pc/index.html')
+
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(index_html_data)
+
