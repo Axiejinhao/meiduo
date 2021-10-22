@@ -189,12 +189,13 @@ class SKUSearchView(SearchView):
     详情页面也是需要静态化实现的,
     但是可以先把详情页面的数据展示出来
 """
+from utils.views import LoginRequiredJSONMixin
 from utils.goods import get_categories
 from utils.goods import get_breadcrumb
 from utils.goods import get_goods_specs
 
 
-class DetailView(View):
+class DetailView(LoginRequiredJSONMixin, View):
     def get(self, request, sku_id):
         try:
             sku = SKU.objects.get(id=sku_id)
@@ -245,7 +246,7 @@ from apps.goods.models import GoodsVisitCount
 from datetime import date
 
 
-class CategoryVisitCountView(View):
+class CategoryVisitCountView(LoginRequiredJSONMixin, View):
     def post(self, request, category_id):
         # 1.接收分类id
         # 2.验证参数(验证分类id)

@@ -6,6 +6,7 @@ from apps.users.views import CenterView, EmailView
 from apps.users.views import EmailVerifyView
 from apps.users.views import AddressCreateView, AddressView
 from apps.users.views import UpdateDestroyAddressView
+from apps.users.views import UserHistoryView
 
 urlpatterns = [
     # 判断用户名是否重复
@@ -20,4 +21,6 @@ urlpatterns = [
     path('addresses/create/', AddressCreateView.as_view()),
     path('addresses/', AddressView.as_view()),
     path('addresses/<address_id>/', UpdateDestroyAddressView.as_view()),
+
+    path('browse_histories/', UserHistoryView.as_view()),
 ]
