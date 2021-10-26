@@ -200,6 +200,10 @@ class LoginView(View):
 
         response.set_cookie('username', username)
 
+        # 必须是登录后合并购物车
+        from apps.carts.utils import merge_cookie_to_redis
+        response = merge_cookie_to_redis(request, response)
+
         return response
 
 

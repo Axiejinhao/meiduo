@@ -214,13 +214,18 @@ class CartsView(View):
             # 4.1 连接redis
             redis_cli = get_redis_connection('carts')
 
+            pipeline = redis_cli.pipeline()
+
             # 4.2 操作hash
             # redis_cli = hset(key, field, value)
-            redis_cli.hset('carts_%s' % user.id, sku_id, count)
+            # redis_cli.hset('carts_%s' % user.id, sku_id, count)
+            # 会进行累加
+            pipeline.hincrby('carts_%s' % user.id, sku_id, count)
 
             # 4.3 操作set
-            redis_cli.sadd('select_%s' % user.id, sku_id)
+            pipeline.sadd('select_%s' % user.id, sku_id)
 
+            pipeline.execute()
             # 4.4 返回响应
             return JsonResponse({'code': 0, 'errmsg': 'ok'})
         else:
@@ -232,9 +237,7 @@ class CartsView(View):
                 carts = pickle.loads(base64.b64decode(cookie_carts))
             else:
                 # 5.1 先有cookie字典
-                carts = {
-                    sku_id: {}
-                }
+                carts = {}
             # 判断新增商品是否在数据库中
             if sku_id in carts:
                 # 购物车中已经有该商品id,数量累加
