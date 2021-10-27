@@ -91,11 +91,14 @@ class OrderSettlementView(LoginRequiredJSONMixin, View):
                 'price': sku.price
             })
 
+        from decimal import Decimal
+        freight = Decimal('10')
+
         context = {
             'skus': sku_list,
             'addresses': addresses_list,
             # 运费
-            'freight': 10
+            'freight': freight
         }
 
         return JsonResponse({'code': 0, 'errmsg': 'ok', 'context': context})

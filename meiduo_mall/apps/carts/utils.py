@@ -67,7 +67,7 @@ def merge_cookie_to_redis(request, response):
         user = request.user
 
         # 4. 将字典数据，列表数据分别添加到redis中
-        redis_cli = get_redis_connection()
+        redis_cli = get_redis_connection('carts')
         pipeline = redis_cli.pipeline()
         pipeline.hmset('carts_%s' % user.id, cookie_dict)
 
