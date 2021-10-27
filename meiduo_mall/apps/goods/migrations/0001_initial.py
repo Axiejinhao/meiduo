@@ -47,8 +47,6 @@ class Migration(migrations.Migration):
             name='GoodsChannelGroup',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, verbose_name='更新时间')),
                 ('name', models.CharField(max_length=20, verbose_name='频道组名')),
             ],
             options={
@@ -72,8 +70,9 @@ class Migration(migrations.Migration):
                 ('sales', models.IntegerField(default=0, verbose_name='销量')),
                 ('comments', models.IntegerField(default=0, verbose_name='评价数')),
                 ('is_launched', models.BooleanField(default=True, verbose_name='是否上架销售')),
+                ('category', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='goods.goodscategory',verbose_name='从属类别')),
                 ('default_image', models.ImageField(blank=True, default='', max_length=200, null=True, upload_to='', verbose_name='默认图片')),
-                ('category', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='goods.goodscategory', verbose_name='从属类别')),
+
             ],
             options={
                 'verbose_name': '商品SKU',
@@ -90,13 +89,13 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=50, verbose_name='名称')),
                 ('sales', models.IntegerField(default=0, verbose_name='销量')),
                 ('comments', models.IntegerField(default=0, verbose_name='评价数')),
+                ('brand',models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='goods.brand', verbose_name='品牌')),
+                ('category1', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='cat1_spu',to='goods.goodscategory', verbose_name='一级类别')),
+                ('category2', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='cat2_spu',to='goods.goodscategory', verbose_name='二级类别')),
+                ('category3', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='cat3_spu',to='goods.goodscategory', verbose_name='三级类别')),
                 ('desc_detail', models.TextField(default='', verbose_name='详细介绍')),
                 ('desc_pack', models.TextField(default='', verbose_name='包装信息')),
                 ('desc_service', models.TextField(default='', verbose_name='售后服务')),
-                ('brand', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='goods.brand', verbose_name='品牌')),
-                ('category1', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='cat1_spu', to='goods.goodscategory', verbose_name='一级类别')),
-                ('category2', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='cat2_spu', to='goods.goodscategory', verbose_name='二级类别')),
-                ('category3', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='cat3_spu', to='goods.goodscategory', verbose_name='三级类别')),
             ],
             options={
                 'verbose_name': '商品SPU',
@@ -176,9 +175,10 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='更新时间')),
+                ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='goods.goodscategory',verbose_name='商品分类')),
                 ('count', models.IntegerField(default=0, verbose_name='访问量')),
                 ('date', models.DateField(auto_now_add=True, verbose_name='统计日期')),
-                ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='goods.goodscategory', verbose_name='商品分类')),
+
             ],
             options={
                 'verbose_name': '统计分类商品访问量',
@@ -192,10 +192,10 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('create_time', models.DateTimeField(auto_now_add=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, verbose_name='更新时间')),
+                ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='goods.goodschannelgroup',verbose_name='频道组名')),
                 ('url', models.CharField(max_length=50, verbose_name='频道页面链接')),
                 ('sequence', models.IntegerField(verbose_name='组内顺序')),
                 ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='goods.goodscategory', verbose_name='顶级商品类别')),
-                ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='goods.goodschannelgroup', verbose_name='频道组名')),
             ],
             options={
                 'verbose_name': '商品频道',
