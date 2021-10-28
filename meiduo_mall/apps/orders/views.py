@@ -171,17 +171,69 @@ class OrderSettlementView(LoginRequiredJSONMixin, View):
         四。返回响应
 """
 
+import json
+from apps.orders.models import OrderInfo
+
 
 class OrderCommitView(View):
     def post(self, request):
+        user = request.user
         # 一.接收请求  user,address_id,pay_method
+
+        data = json.loads(request.body.decode())
+        address_id = data.get('address_id')
+        pay_method = data.get('pay_method')
+
         # 二.验证数据
-        # order_id 主键（自己生成）
+        if not all([address_id, pay_method]):
+            return JsonResponse({'code': 400, 'errmsg': '参数不全'})
+
+        try:
+            address = Address.objects.get(id=address_id)
+        except Address.DoesNotExist:
+            return JsonResponse({'code': 400, 'errmsg': '参数不正确'})
+
+        # if pay_method not in [1,2] 代码的可读性来说很差
+        if pay_method not in [OrderInfo.PAY_METHODS_ENUM['CASH'], OrderInfo.PAY_METHODS_ENUM['ALIPAY']]:
+            return JsonResponse({'code': 400, 'errmsg': '参数不正确'})
+
+        # order_id主键(自己生成)
+        from django.utils import timezone
+        from datetime import datetime
+        # %f 微秒
+        order_id = timezone.localtime().strftime('%Y%m%d%H%M%S%f') + '%09d' % user.id
+
         # 支付状态由支付方式决定
+        # if pay_method == 1: # 货到付款
+        #     pay_status=2
+        # else:
+        #     pay_status=1
+
+        # 货到付款
+        if pay_method == OrderInfo.PAY_METHODS_ENUM['CASH']:
+            status = OrderInfo.ORDER_STATUS_ENUM['UNSEND']
+        else:
+            status = OrderInfo.ORDER_STATUS_ENUM['UNPAID']
+
         # 总数量，总金额 = 0, 0
+        total_count = 0
+        from decimal import Decimal
+        total_amonut = Decimal('0')
         # 运费
-        # 三.数据入库  生成订单（订单基本信息表和订单商品信息表）
+        freight = Decimal('10.00')
+
+        # 三.数据入库 生成订单(订单基本信息表和订单商品信息表)
         # 1.先保存订单基本信息
+        OrderInfo.objects.create(
+            order_id=order_id,
+            user=user,
+            address=address,
+            total_count=total_count,
+            total_amount=total_amonut,
+            freight=freight,
+            pay_method=pay_method,
+            status=status
+        )
         # 2 再保存订单商品信息
         # 2.1 连接redis
         # 2.2 获取hash
