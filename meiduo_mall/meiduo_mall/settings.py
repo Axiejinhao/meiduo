@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'apps.contents',
     'apps.carts',
     'apps.orders',
+    'apps.pay',
     # CORS
     'corsheaders',
     # haystack
