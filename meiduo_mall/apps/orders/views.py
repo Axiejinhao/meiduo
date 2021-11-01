@@ -259,50 +259,57 @@ class OrderCommitView(View):
 
             # 2.5 遍历根据选中商品的id进行查询
             for sku_id, count in carts.items():
-                sku = SKU.objects.get(id=sku_id)
-                # 2.6 判断库存是否充足
-                if sku.stock < count:
-                    # 2.7 如果不充足，下单失败
-                    # 回滚点
-                    transaction.savepoint_rollback(point)
 
-                    return JsonResponse({'code': 400, 'errmsg': '库存不足'})
+                # for i in range(10):
+                while True:
 
-                from time import sleep
-                sleep(7)
+                    sku = SKU.objects.get(id=sku_id)
+                    # 2.6 判断库存是否充足
+                    if sku.stock < count:
+                        # 2.7 如果不充足，下单失败
+                        # 回滚点
+                        transaction.savepoint_rollback(point)
 
-                # 2.8 如果充足，则库存减少，销量增加
-                # sku.stock -= count
-                # sku.sales += count
-                # sku.save()
+                        return JsonResponse({'code': 400, 'errmsg': '库存不足'})
 
-                # a. 先记录某一个数据
-                old_stock = sku.stock
+                    from time import sleep
+                    sleep(7)
 
-                # b. 我更新的时候,再比对一下这个记录对不对
-                new_stock = sku.stock - count
-                new_sales = sku.sales + count
+                    # 2.8 如果充足，则库存减少，销量增加
+                    # sku.stock -= count
+                    # sku.sales += count
+                    # sku.save()
 
-                result = SKU.objects.filter(id=sku_id, stock=old_stock).update(stock=new_stock, sales=new_sales)
-                # result = 1 表示 有1条记录修改成功
-                # result = 0 表示 没有更新
+                    # a. 先记录某一个数据
+                    old_stock = sku.stock
 
-                if result == 0:
-                    # 暂时回滚和返回下单失败
-                    transaction.savepoint_rollback(point)
-                    return JsonResponse({'code': 400, 'errmsg': '下单失败'})
+                    # b. 我更新的时候,再比对一下这个记录对不对
+                    new_stock = sku.stock - count
+                    new_sales = sku.sales + count
 
-                # 2.9 累加总数量和总金额
-                orderinfo.total_count += count
-                orderinfo.total_amount += (count * sku.price)
+                    result = SKU.objects.filter(id=sku_id, stock=old_stock).update(stock=new_stock, sales=new_sales)
+                    # result = 1 表示 有1条记录修改成功
+                    # result = 0 表示 没有更新
 
-                # 2.10 保存订单商品信息
-                OrderGoods.objects.create(
-                    order=orderinfo,
-                    sku=sku,
-                    count=count,
-                    price=sku.price
-                )
+                    if result == 0:
+                        sleep(0.005)
+                        continue
+                        # 暂时回滚和返回下单失败
+                        # transaction.savepoint_rollback(point)
+                        # return JsonResponse({'code': 400, 'errmsg': '下单失败'})
+
+                    # 2.9 累加总数量和总金额
+                    orderinfo.total_count += count
+                    orderinfo.total_amount += (count * sku.price)
+
+                    # 2.10 保存订单商品信息
+                    OrderGoods.objects.create(
+                        order=orderinfo,
+                        sku=sku,
+                        count=count,
+                        price=sku.price
+                    )
+                    break
             # 3.更新订单的总金额和总数量
             orderinfo.save()
             # 事务提交
@@ -332,23 +339,18 @@ class OrderCommitView(View):
 
 MySQL数据库事务隔离级别主要有四种：
 
-    Serializable：串行化，一个事务一个事务的执行。  用的并不多
+    Serializable：串行化,一个事务一个事务的执行,用的并不多
+    
+    Repeatable read：可重复读,无论其他事务是否修改并提交了数据,在这个事务中看到的数据值始终不受其他事务影响
+    
+    Read committed：读取已提交,其他事务提交了对数据的修改后,本事务就能读取到修改后的数据值
+    
+    Read uncommitted：读取未提交,其他事务只要修改了数据,即使未提交,本事务也能看到修改后的数据值
 
-    Repeatable read：可重复读，无论其他事务是否修改并提交了数据，在这个事务中看到的数据值始终不受其他事务影响。
+MySQL数据库默认使用可重复读(Repeatable read)
 
-    Read committed：读取已提交，其他事务提交了对数据的修改后，本事务就能读取到修改后的数据值。
-
-    Read uncommitted：读取未提交，其他事务只要修改了数据，即使未提交，本事务也能看到修改后的数据值。
-
-
-    举例：     5,7 库存 都是  8
-
-    甲   5,   7        5
-
-    乙  7,    5         5
-
-
-MySQL数据库默认使用可重复读（ Repeatable read）
-
-
+修改:
+        sudo vim /etc/mysql/mysql.conf.d/mysql.cnf
+添加:    transaction-isolation=READ-COMMITTED
+        sudo service mysql restart
 """
