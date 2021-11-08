@@ -99,8 +99,19 @@ DATABASES = {
         'USER': 'meiduo',
         'PASSWORD': 'meiduo',
         'NAME': 'meiduo_mall',
+    },
+    'slave': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '172.17.0.1',
+        'PORT': '8306',
+        'USER': 'meiduo',
+        'PASSWORD': 'meiduo',
+        'NAME': 'meiduo_mall',
     }
 }
+
+DATABASE_ROUTERS = ['utils.db_router.MasterSlaveDBRouter']
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
