@@ -96,18 +96,18 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': '127.0.0.1',
         'PORT': '3306',
-        'USER': 'meiduo',
-        'PASSWORD': 'meiduo',
+        'USER': 'root',
+        'PASSWORD': 'mysql',
+        'NAME': 'meiduo_mall',
+    },
+    'slave': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '127.0.0.1',
+        'PORT': '8306',
+        'USER': 'root',
+        'PASSWORD': 'mysql',
         'NAME': 'meiduo_mall',
     }
-    # 'slave': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'HOST': '127.0.0.1',
-    #     'PORT': '8306',
-    #     'USER': 'meiduo',
-    #     'PASSWORD': 'meiduo',
-    #     'NAME': 'meiduo_mall',
-    # }
 }
 
 DATABASE_ROUTERS = ['utils.db_router.MasterSlaveDBRouter']

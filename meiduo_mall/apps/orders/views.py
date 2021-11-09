@@ -350,7 +350,7 @@ MySQL数据库事务隔离级别主要有四种：
 MySQL数据库默认使用可重复读(Repeatable read)
 
 修改:
-        sudo vim /etc/mysql/mysql.conf.d/mysql.cnf
+        sudo vim /etc/mysql/mysql.conf.d/mysqld.cnf
 添加:    transaction-isolation=READ-COMMITTED
         sudo service mysql restart
 """
