@@ -1,0 +1,53 @@
+python的虚拟环境/终端
+在虚拟环境新建项目 django-admin startproject 项目名
+
+在项目下运行项目 python manage.py runserver
+
+在项目下新建子应用 python manage.py startapp 应用名
+			django-admin startapp 应用名
+
+修改模型或表后,模型迁移(建表)
+生成迁移文件 python manage.py makemigrations
+执行迁移 python manage.py migrate
+
+创建超级管理员 python manage.py createsuperuser
+
+管理员密码重置
+python manage.py shell
+>>> from django.contrib.auth.models import User
+>>> user = User.objects.get(username='myadmin')
+>>> user.set_password('a12345678')
+>>> user.save()
+
+运行前端页面 python3 -m http.server 8080
+
+虚拟环境运行uwsgi文件 uwsgi --ini uwsgi.ini
+			uwsgi --stop uwsgi.pid
+			uwsgi --reload uwsgi.pid
+			ps aux | grep uwsgi
+
+
+代码
+添加子应用,在项目目录的settings.py的INSTALLED_APPS添加'book.apps.BookConfig'或'book'(应用名)
+
+设置网站中文,项目文件的setting.py的LANGUAGE_CODE = 'zh-Hans'
+设置时区,同上的TIME_ZONE = 'Asia/Shanghai'
+
+网页访问顺序先工程urls.py再访问子应用urls.py
+
+将网页渲染的文字传到html中参数使用{{ }}
+
+静态文件放置于项目目录的settings.py的STATIC_URL
+
+将数据库更改为mysql:项目目录settings.py的
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'USER': 'test',
+        'PASSWORD': '123456',
+        'NAME': 'book',
+    }
+}
+
